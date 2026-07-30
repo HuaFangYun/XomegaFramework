@@ -130,7 +130,7 @@ namespace Xomega.Framework
         /// <param name="row">The row in a data list to update, or null if the property is not in a data list.</param>
         /// <param name="token">Cancellation token.</param>
         /// <returns>The task for the asynchronous operation.</returns>
-        public async virtual Task UpdateAsync(DataRow row, CancellationToken token)
+        public virtual async Task UpdateAsync(DataRow row, CancellationToken token)
         {
             Update(row);
             await Task.CompletedTask;

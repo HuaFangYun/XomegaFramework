@@ -1,6 +1,5 @@
 ﻿// Copyright (c) 2026 Xomega.Net. All rights reserved.
 
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
@@ -146,7 +145,7 @@ namespace Xomega.Framework
         /// <summary>
         /// A method to fire a property change event.
         /// If certain property information is calculated and depends on the factors
-        /// that are outside of the property's control (e.g. editability), 
+        /// that are outside the property's control (e.g. editability), 
         /// then this method may need to be called from outside to fire a property change event
         /// if certain conditions that affect the calculated value have changed.
         /// </summary>
@@ -154,7 +153,7 @@ namespace Xomega.Framework
         public void FirePropertyChange(PropertyChangeEventArgs args)
         {
             Change?.Invoke(this, args);
-            AsyncChange?.DynamicInvoke(this, args, default(CancellationToken));
+            AsyncChange?.DynamicInvoke(this, args, CancellationToken.None);
         }
 
         /// <summary>
@@ -266,8 +265,9 @@ namespace Xomega.Framework
         /// <param name="args">Arguments for the specified expression to use for evaluation.</param>
         public void SetComputedEditable(LambdaExpression expression, params object[] args)
         {
-            if (editableBinding != null) editableBinding.Dispose();
+            editableBinding?.Dispose();
             editableBinding = expression == null ? null : new ComputedEditableBinding(this, expression, args);
+            UpdateComputedEditable();
         }
 
         /// <summary>
@@ -275,11 +275,21 @@ namespace Xomega.Framework
         /// in addition to automatic updates when the underlying properties change.
         /// </summary>
         /// <param name="row">The row to update editability of the property for, or null to update it for the entire property.</param>
-        public void UpdateComputedEditable(DataRow row = null)
+        public void UpdateComputedEditable(DataRow row = null) => editableBinding?.Update(row);
+
+        /// <summary>
+        /// Manually asynchronously updates the property editability with the computed result,
+        /// in addition to automatic updates when the underlying properties change.
+        /// </summary>
+        /// <param name="row">The row to update editability of the property for, or null to update it for the entire property.</param>
+        /// <param name="token">Cancellation token.</param>
+        /// <returns>The task for the asynchronous operation.</returns>
+        public async Task UpdateComputedEditableAsync(DataRow row = null, CancellationToken token = default)
         {
             if (editableBinding != null)
-                editableBinding.Update(row);
+                await editableBinding.UpdateAsync(row, token);
         }
+
         #endregion
 
         #region Visibility support
@@ -320,19 +330,29 @@ namespace Xomega.Framework
         /// <param name="args">Arguments for the specified expression to use for evaluation.</param>
         public void SetComputedVisible(LambdaExpression expression, params object[] args)
         {
-            if (visibleBinding != null) visibleBinding.Dispose();
+            visibleBinding?.Dispose();
             visibleBinding = expression == null ? null : new ComputedVisibleBinding(this, expression, args);
+            UpdateComputedVisible();
         }
 
         /// <summary>
         /// Manually updates the property visibility with the computed result,
         /// in addition to automatic updates when the underlying properties change.
         /// </summary>
-        public void UpdateComputedVisible()
+        public void UpdateComputedVisible() => visibleBinding?.Update(null);
+
+        /// <summary>
+        /// Manually asynchronously updates the property visibility with the computed result,
+        /// in addition to automatic updates when the underlying properties change.
+        /// </summary>
+        /// <param name="token">Cancellation token.</param>
+        /// <returns>The task for the asynchronous operation.</returns>
+        public async Task UpdateComputedVisibleAsync(CancellationToken token = default)
         {
             if (visibleBinding != null)
-                visibleBinding.Update(null);
+                await visibleBinding.UpdateAsync(null, token);
         }
+
         #endregion
 
         #region Required support
@@ -371,9 +391,16 @@ namespace Xomega.Framework
         /// <param name="args">Arguments for the specified expression to use for evaluation.</param>
         public void SetComputedRequired(LambdaExpression expression, params object[] args)
         {
-            if (requiredBinding != null) requiredBinding.Dispose();
+            requiredBinding?.Dispose();
             requiredBinding = expression == null ? null : new ComputedRequiredBinding(this, expression, args);
+            UpdateComputedRequired();
         }
+
+        /// <summary>
+        /// Manually updates the property required flag with the computed result,
+        /// in addition to automatic updates when the underlying properties change.
+        /// </summary>
+        public void UpdateComputedRequired() => requiredBinding?.Update(null);
 
         /// <summary>
         /// Manually updates the property required flag with the computed result,

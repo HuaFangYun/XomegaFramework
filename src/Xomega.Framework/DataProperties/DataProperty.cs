@@ -281,7 +281,7 @@ namespace Xomega.Framework
         /// <param name="args">Arguments for the specified expression to use for evaluation.</param>
         public void SetComputedValue(LambdaExpression expression, params object[] args)
         {
-            if (valueBinding != null) valueBinding.Dispose();
+            valueBinding?.Dispose();
             if (expression != null)
             {
                 valueBinding = new ComputedValueBinding(this, expression, args);
@@ -289,10 +289,18 @@ namespace Xomega.Framework
                 Required = false;
             }
             else valueBinding = null;
+            UpdateComputedValue();
         }
 
         /// <summary>
         /// Manually updates the property value with the computed result,
+        /// in addition to automatic updates when the underlying properties change.
+        /// </summary>
+        /// <param name="row">The row in a data list to update, or null if the property is not in a data list.</param>
+        public void UpdateComputedValue(DataRow row = null) => valueBinding?.Update(row);
+
+        /// <summary>
+        /// Manually asynchronously updates the property value with the computed result,
         /// in addition to automatic updates when the underlying properties change.
         /// </summary>
         /// <param name="row">The row in a data list to update, or null if the property is not in a data list.</param>

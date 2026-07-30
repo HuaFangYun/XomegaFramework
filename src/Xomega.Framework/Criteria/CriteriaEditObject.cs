@@ -88,7 +88,7 @@ namespace Xomega.Framework.Criteria
             Expression<Func<DataProperty, DataProperty, bool>> addEnabled = (pOp, pVal) => group.HasValue() ||
                 pOp != null && pOp.InternalValue != null || pVal != null && pVal.InternalValue != null;
             AddAction.SetComputedEnabled(addEnabled, OperatorProperty, ValueProperty);
-            AddAction.UpdateComputedEnabed();
+            AddAction.UpdateComputedEnabled();
 
             OnInitialized();
         }

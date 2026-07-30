@@ -52,7 +52,7 @@ namespace Xomega.Framework.Criteria
         /// <summary>
         /// A map of criteria property groups for each field criteria.
         /// </summary>
-        public Dictionary<string, CriteriaPropertyGroup> CriteriaFieldGroups { get; private set; } = new Dictionary<string, CriteriaPropertyGroup>();
+        public Dictionary<string, CriteriaPropertyGroup> CriteriaFieldGroups { get; } = new Dictionary<string, CriteriaPropertyGroup>();
 
         /// <summary>
         /// Adds specified criteria property group to the criteria object.
@@ -169,7 +169,7 @@ namespace Xomega.Framework.Criteria
         }
 
         /// <inheritdoc/>
-        public async override Task SetValuesAsync(NameValueCollection nvc, CancellationToken token)
+        public override async Task SetValuesAsync(NameValueCollection nvc, CancellationToken token)
         {
             await base.SetValuesAsync(nvc, token);
             AdjustOperators();

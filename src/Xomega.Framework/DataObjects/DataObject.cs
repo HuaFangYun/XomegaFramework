@@ -168,7 +168,7 @@ namespace Xomega.Framework
         {
             foreach (var a in actions.Values)
             {
-                a.UpdateComputedEnabed();
+                a.UpdateComputedEnabled();
                 a.UpdateComputedVisible();
             }
             
