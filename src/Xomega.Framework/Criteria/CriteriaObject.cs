@@ -83,6 +83,7 @@ namespace Xomega.Framework.Criteria
             {
                 AsyncItemsProvider = async (input, row, token) =>
                     await Task.FromResult(CriteriaFieldGroups
+                    .Where(g => g.Value.IsEditable())
                     .Select(g => g.Value.FieldName)
                     .Where(f => !StaticFields.Contains(f))),
                 ValueConverter = (ref object value, ValueFormat format) =>
@@ -162,32 +163,108 @@ namespace Xomega.Framework.Criteria
         /// Sets values from the given collection and adjusts values for operators
         /// </summary>
         /// <param name="nvc">Collection to set values from</param>
-        public override void SetValues(NameValueCollection nvc)
+        /// <param name="lockCriteria">True to make criteria non-editable, false otherwise</param>
+        public void SetValues(NameValueCollection nvc, bool lockCriteria)
         {
             base.SetValues(nvc);
             AdjustOperators();
+            LockCriteria(nvc, lockCriteria);
         }
 
-        /// <inheritdoc/>
-        public override async Task SetValuesAsync(NameValueCollection nvc, CancellationToken token)
+        /// <summary>
+        /// Sets values from the given collection and adjusts values for operators
+        /// </summary>
+        /// <param name="nvc">Collection to set values from</param>
+        /// <param name="lockCriteria">True to make criteria non-editable, false otherwise</param>
+        /// <param name="token">Cancellation token.</param>
+        public async Task SetValuesAsync(NameValueCollection nvc, bool lockCriteria, CancellationToken token = default)
         {
             await base.SetValuesAsync(nvc, token);
             AdjustOperators();
+            LockCriteria(nvc, lockCriteria);
+        }
+
+        /// <summary>
+        /// Sets the editable flag to the opposite of the specified lock criteria flag
+        /// on the criteria group or individual property that corresponds to each key
+        /// in the given name/value collection.
+        /// </summary>
+        /// <param name="nvc">Collection with keys corresponding to criteria fields or properties to lock.</param>
+        /// <param name="lockCriteria">True to make matching criteria non-editable, false to make them editable.</param>
+        protected void LockCriteria(NameValueCollection nvc, bool lockCriteria)
+        {
+            if (nvc == null) return;
+
+            foreach (var key in nvc.AllKeys)
+            {
+                if (key == null) continue;
+
+                var fieldName = key;
+                if (fieldName.EndsWith(Operator)) fieldName = fieldName.Substring(0, fieldName.Length - Operator.Length);
+                else if (fieldName.EndsWith(V2)) fieldName = fieldName.Substring(0, fieldName.Length - V2.Length);
+
+                if (CriteriaFieldGroups.TryGetValue(fieldName, out var group))
+                    group.SetEditable(!lockCriteria);
+                else if (HasProperty(key))
+                {
+                    this[key].Editable = !lockCriteria;
+
+                    // criteria not part of a group also have separate operator and V2 properties to lock
+                    var operatorProperty = fieldName + Operator;
+                    if (HasProperty(operatorProperty))
+                        this[operatorProperty].Editable = !lockCriteria;
+
+                    var value2Property = fieldName + V2;
+                    if (HasProperty(value2Property))
+                        this[value2Property].Editable = !lockCriteria;
+                }
+            }
         }
 
         private void AdjustOperators()
         {
             // clear operators, for which associated properties are blank
-            foreach (DataProperty p in Properties.Where(p => p is OperatorProperty).ToList())
+            foreach (var p in Properties.Where(p => p is OperatorProperty).ToList())
             {
-                OperatorProperty op = p as OperatorProperty;
-                bool isBlank = true;
-                foreach (string nm in new string[] { op.AdditionalPropertyName, op.AdditionalPropertyName2 })
+                var op = p as OperatorProperty;
+                var isBlank = true;
+                foreach (var nm in new[] { op?.AdditionalPropertyName, op?.AdditionalPropertyName2 })
                 {
                     if (nm != null && HasProperty(nm) && !this[nm].IsNull()) isBlank = false;
                 }
-                if (isBlank) op.SetValue(null);
+                if (isBlank) op?.SetValue(null);
             }
+        }
+        
+
+        /// <summary>
+        /// Resets data object to initial values, optionally only for the editable properties.
+        /// </summary>
+        /// <param name="editableOnly">True to reset only editable properties, false to reset all of them.</param>
+        public void ResetData(bool editableOnly)
+        {
+            if (!editableOnly)
+            {
+                ResetData();
+                return;
+            }
+            foreach (var p in Properties.Where(p => p.Editable))
+                p.ResetValue();
+        }
+
+        /// <summary>
+        /// Resets data object to initial values asynchronously, optionally only for the editable properties.
+        /// </summary>
+        /// <param name="editableOnly">True to reset only editable properties, false to reset all of them.</param>
+        public async Task ResetDataAsync(bool editableOnly)
+        {
+            if (!editableOnly)
+            {
+                await ResetDataAsync();
+                return;
+            }
+            foreach (var p in Properties.Where(p => p.Editable))
+                await p.ResetValueAsync();
         }
 
         /// <summary>
@@ -229,19 +306,20 @@ namespace Xomega.Framework.Criteria
         /// <returns>A list of criteria display structures.</returns>
         public List<FieldCriteriaDisplay> GetCriteriaDisplays(bool nonStaticOnly)
         {
-            List<FieldCriteriaDisplay> displays = new List<FieldCriteriaDisplay>();
+            var displays = new List<FieldCriteriaDisplay>();
             var resMgr = ResourceMgr ?? Messages.ResourceManager;
             var and = resMgr.GetString(Messages.Operator_And);
             foreach (var grp in CriteriaFieldGroups.Values.Where(g => 
                 g.HasValue() && (!nonStaticOnly || !StaticFields.Contains(g.FieldName))))
             {
-                FieldCriteriaDisplay display = new FieldCriteriaDisplay()
+                var display = new FieldCriteriaDisplay()
                 {
                     Field = grp.FieldName,
                     Label = this[grp.FieldName].Label,
-                    Operator = grp.OperatorProperty?.DisplayStringValue
+                    Operator = grp.OperatorProperty?.DisplayStringValue,
+                    Editable = grp.IsEditable()
                 };
-                List<string> values = new List<string>();
+                var values = new List<string>();
                 if (!grp.ValueProperty.IsNull())
                 {
                     var val = grp.ValueProperty.ResolveValue(grp.ValueProperty.InternalValue, ValueFormat.DisplayString);

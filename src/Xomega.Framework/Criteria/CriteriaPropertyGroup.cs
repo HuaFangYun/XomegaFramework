@@ -54,6 +54,25 @@ namespace Xomega.Framework.Criteria
         }
 
         /// <summary>
+        /// Determines if the criteria group is editable.
+        /// </summary>
+        /// <returns>True if either operator or the value are editable.</returns>
+        public bool IsEditable()
+        {
+            return OperatorProperty != null && OperatorProperty.Editable || ValueProperty.Editable;
+        }
+
+        /// <summary>
+        /// Sets the editable flag for the criteria group.
+        /// </summary>
+        public void SetEditable(bool editable)
+        {
+            if (OperatorProperty != null) OperatorProperty.Editable = editable;
+            if (ValueProperty != null) ValueProperty.Editable = editable;
+            if (Value2Property != null) Value2Property.Editable = editable;
+        }
+
+        /// <summary>
         /// Clears all the values in the group.
         /// </summary>
         public void Reset()

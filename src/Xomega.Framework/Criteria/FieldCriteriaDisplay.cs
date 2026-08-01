@@ -28,6 +28,11 @@ namespace Xomega.Framework.Criteria
         public string And { get; set; }
 
         /// <summary>
+        /// Indicates whether the criteria field is editable or not.
+        /// </summary>
+        public bool Editable { get; set; }
+
+        /// <summary>
         /// Array of display values for the criteria.
         /// For single-value criteria the array will have one element.
         /// For range values the array will have two elements - from and to.

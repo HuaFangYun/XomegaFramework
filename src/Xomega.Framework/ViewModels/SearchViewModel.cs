@@ -40,7 +40,7 @@ namespace Xomega.Framework.Views
                 List.RowSelectionMode = Params[ViewParams.SelectionMode.Param];
 
             // set criteria from the parameters
-            if (List.CriteriaObject != null) List.CriteriaObject.SetValues(Params);
+            List.CriteriaObject?.SetValues(Params, ShouldLockActivatedCriteria);
 
             // auto-run search if specified so in parameters, or if there are no criteria to set
             if (Params[ViewParams.Action.Param] == ViewParams.Action.Search || List.CriteriaObject == null)
@@ -67,7 +67,8 @@ namespace Xomega.Framework.Views
             else List.SelectAction.Visible = false;
 
             // set criteria from the parameters
-            if (List.CriteriaObject != null) await List.CriteriaObject.SetValuesAsync(Params, token);
+            if (List.CriteriaObject != null)
+                await List.CriteriaObject.SetValuesAsync(Params, ShouldLockActivatedCriteria, token);
 
             // auto-run search if specified so in parameters, or if there are no criteria to set
             if (Params[ViewParams.Action.Param] == ViewParams.Action.Search || List.CriteriaObject == null)
@@ -79,6 +80,13 @@ namespace Xomega.Framework.Views
 
             return true;
         }
+        
+        /// <summary>
+        /// Determines whether to lock the criteria activated from the corresponding parameters.
+        /// Normally, locking passed criteria makes sense for child list views, so
+        /// the default implementation checks if the query source parameter is present.
+        /// </summary>
+        protected virtual bool ShouldLockActivatedCriteria => Params[ViewParams.QuerySource] != null;
 
         #endregion
 
@@ -209,7 +217,7 @@ namespace Xomega.Framework.Views
             if (List != null)
             {
                 List.ResetData();
-                List.CriteriaObject?.ResetData();
+                List.CriteriaObject?.ResetData(true);
                 Errors = null;
             }
             if (AutoCollapseCriteria)
@@ -221,12 +229,13 @@ namespace Xomega.Framework.Views
         /// </summary>
         /// <param name="sender">Command sender</param>
         /// <param name="e">Event arguments</param>
-        public async virtual Task ResetAsync(object sender, EventArgs e)
+        public virtual async Task ResetAsync(object sender, EventArgs e)
         {
             if (List != null)
             {
                 await List.ResetDataAsync();
-                await List.CriteriaObject?.ResetDataAsync();
+                if (List.CriteriaObject != null)
+                    await List.CriteriaObject.ResetDataAsync(true);
                 Errors = null;
             }
             if (AutoCollapseCriteria)

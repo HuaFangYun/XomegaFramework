@@ -9,24 +9,27 @@
         <div class="vstack gap-3 @Class">
             @foreach (var crit in displays)
             {
-                <div class="criteria-display card @(crit.Field.Equals(Criteria?.FieldSelectorProperty?.EditStringValue) ? "border-primary" : "")">
+                <div class="criteria-display@(crit.Editable ? "" : "-locked") card @(crit.Field.Equals(Criteria?.FieldSelectorProperty?.EditStringValue) ? "border-primary" : "")">
                     <div class="card-header d-flex align-items-center px-2">
                         <span class="fw-semibold me-auto">@crit.Label</span>
+                      @if(crit.Editable)
+                      {
                         <button class="btn-close ms-1" @onclick="() => Criteria?.ResetCriteria(crit.Field)"></button>
+                      }
                     </div>
                     <div class="card-body p-2">
                         @if (!string.IsNullOrEmpty(crit.Operator))
                         {
                             <div>
                                 <span class="@(crit.Value.Length > 0 ? "fst-italic" : "fw-normal badge fs-6 text-bg-light")"
-                                style="@ClickableStyle" @onclick="() => Criteria?.EditCriteria(crit.Field)">@crit.Operator</span>
+                                style="@ClickableStyle(crit)" @onclick="() => EditCriteria(crit)">@crit.Operator</span>
                             </div>
                         }
                         @if (crit.Value.Length > 0)
                         {
                             <div class="d-flex flex-wrap @(string.IsNullOrEmpty(crit.Operator) ? "" : "ps-2")">
                                 <span class="me-1 fw-normal badge fs-6 text-bg-light"
-                                style="@ClickableStyle" @onclick="() => Criteria?.EditCriteria(crit.Field)">@crit.Value[0]</span>
+                                style="@ClickableStyle(crit)" @onclick="() => EditCriteria(crit)">@crit.Value[0]</span>
                                 @if (crit.And != null)
                                 {
                                     <span class="me-1">@crit.And</span>
@@ -34,7 +37,7 @@
                                 @if (crit.Value.Length > 1)
                                 {
                                     <span class="me-1 fw-normal badge fs-6 text-bg-light"
-                                    style="@ClickableStyle" @onclick="() => Criteria?.EditCriteria(crit.Field)">@crit.Value[1]</span>
+                                    style="@ClickableStyle(crit)" @onclick="() => EditCriteria(crit)">@crit.Value[1]</span>
                                 }
                                 @if (crit.Value.Length > 2)
                                 {
@@ -60,7 +63,13 @@
     [Parameter]
     public CriteriaObject Criteria { get; set; }
 
-    private const string ClickableStyle = "cursor: pointer";
+    private string ClickableStyle(FieldCriteriaDisplay crit) => crit.Editable ? "cursor: pointer" : "";
+    
+    private void EditCriteria(FieldCriteriaDisplay crit)
+    {
+      if (crit.Editable)
+        Criteria?.EditCriteria(crit.Field);
+    }
 
     protected override async Task OnInitializedAsync()
     {

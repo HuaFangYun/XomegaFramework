@@ -26,7 +26,9 @@ namespace Xomega.Framework.Criteria
 
         /// <summary>
         /// The name of the operator attribute that stores 1 or 0 to indicate
-        /// if the additional property can be multivalued.
+        /// if the additional property can be multivalued. Multiple values can be
+        /// specified (e.g. both 0 and 1) to allow the operator to apply regardless
+        /// of whether the additional property is multivalued or not.
         /// </summary>
         public const string AttributeMultival = "multival";
 
@@ -152,9 +154,13 @@ namespace Xomega.Framework.Criteria
         public bool IsApplicable(Header oper, DataRow row = null)
         {
             object multiVal = oper[AttributeMultival];
-            if (additionalProperty == null && multiVal != null || additionalProperty != null && (
-                "0".Equals(multiVal) && additionalProperty.IsMultiValued ||
-                "1".Equals(multiVal) && !additionalProperty.IsMultiValued)) return false;
+            if (multiVal != null)
+            {
+                if (additionalProperty == null) return false;
+                string required = additionalProperty.IsMultiValued ? "1" : "0";
+                bool matches = multiVal is IList multiVals ? multiVals.Contains(required) : required.Equals(multiVal);
+                if (!matches) return false;
+            }
 
             int.TryParse("" + oper[AttributeAddlProps], out int depCnt);
             if (depCnt > 0 && additionalProperty == null || depCnt > 1 && additionalProperty2 == null)
