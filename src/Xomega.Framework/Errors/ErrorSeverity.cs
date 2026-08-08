@@ -8,6 +8,11 @@ namespace Xomega.Framework
     public enum ErrorSeverity
     {
         /// <summary>
+        /// No error, success message that can be displayed to the user.
+        /// </summary>
+        None,
+
+        /// <summary>
         /// Information message that can be displayed to the user.
         /// </summary>
         Info,

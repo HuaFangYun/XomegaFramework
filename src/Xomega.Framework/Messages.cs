@@ -339,34 +339,14 @@ namespace Xomega.Framework
         public const string View_DeleteTitle = "View_DeleteTitle";
 
         /// <summary>
-        /// Please review the following error.
-        /// </summary>
-        public const string View_Error = "View_Error";
-
-        /// <summary>
         /// Validation Error
         /// </summary>
         public const string CriteriaView_Error = "CriteriaView_Error";
 
         /// <summary>
-        /// Please review the following errors.
-        /// </summary>
-        public const string View_Errors = "View_Errors";
-
-        /// <summary>
         /// Validation Errors
         /// </summary>
         public const string CriteriaView_Errors = "CriteriaView_Errors";
-
-        /// <summary>
-        /// Please review the following message.
-        /// </summary>
-        public const string View_Message = "View_Message";
-
-        /// <summary>
-        /// Please review the following messages.
-        /// </summary>
-        public const string View_Messages = "View_Messages";
 
         /// <summary>
         /// New {0}
@@ -384,16 +364,6 @@ namespace Xomega.Framework
         /// Unsaved Changes
         /// </summary>
         public const string View_UnsavedTitle = "View_UnsavedTitle";
-
-        /// <summary>
-        /// Please review the following warning.
-        /// </summary>
-        public const string View_Warning = "View_Warning";
-
-        /// <summary>
-        /// Please review the following warnings.
-        /// </summary>
-        public const string View_Warnings = "View_Warnings";
 
         /// <summary>
         /// Second value
@@ -431,5 +401,10 @@ namespace Xomega.Framework
         /// Where {0}=Rows returned, {1}=Total rows
         /// </summary>
         public const string Service_MaxRows = "Service_MaxRows";
+
+        /// <summary>
+        /// Shft+click to close all.
+        /// </summary>
+        public const string Errors_CloseAll = "Errors_CloseAll";
     }
 }

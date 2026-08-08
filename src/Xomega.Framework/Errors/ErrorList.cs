@@ -37,20 +37,12 @@ namespace Xomega.Framework
         }
 
         /// <summary>
-        /// Gets localized title for the error list based on the number and severity of the messages it contains.
+        /// Gets localized tip for closing all error messages it contains.
         /// </summary>
-        /// <param name="viewKey">The view resource key prefix to allow returning a title customized for a specific view.</param>
-        /// <returns>Localized title for the error list.</returns>
-        public string GetTitle(string viewKey = null)
-        {
-            bool plural = Errors.Count > 1;
-            string key = Errors.Any(e => e.Severity > ErrorSeverity.Warning) ? 
-                    (plural ? Messages.View_Errors : Messages.View_Error) :
-                Errors.Any(e => e.Severity > ErrorSeverity.Info) ?
-                    (plural ? Messages.View_Warnings : Messages.View_Warning) :
-                    (plural ? Messages.View_Messages: Messages.View_Message);
-            return resources.GetString(key, viewKey);
-        }
+        /// <param name="viewKey">The view resource key prefix to allow returning a tip customized for a specific view.</param>
+        /// <returns>Localized tip for closing all errors.</returns>
+        public string GetCloseAllTip(string viewKey = null) =>
+            resources.GetString(Messages.Errors_CloseAll, viewKey);
 
         /// <summary>
         /// Gets the text message based on the given error code and parameters.
@@ -141,6 +133,17 @@ namespace Xomega.Framework
         public ErrorMessage AddInfo(string code, params object[] parameters)
         {
             return Add(new ErrorMessage(ErrorType.Message, code, GetMessage(code, parameters), ErrorSeverity.Info));
+        }
+
+        /// <summary>
+        /// Adds a success message to the list with the given error code and additional parameters to substitute.
+        /// </summary>
+        /// <param name="code">The message code.</param>
+        /// <param name="parameters">An array of parameters to substitute into the message placeholders.</param>
+        /// <returns>The error message added to the list for further configuration.</returns>
+        public ErrorMessage AddSuccess(string code, params object[] parameters)
+        {
+            return Add(new ErrorMessage(ErrorType.Message, code, GetMessage(code, parameters), ErrorSeverity.None));
         }
 
         /// <summary>

@@ -7,7 +7,7 @@
 @* the table markup must be wrapped in the cascading value of @this
    for the columns to be initialized before the first render *@
 <CascadingValue Value="@this" IsFixed="true">
-    <table class="table @SelectableClass" style="table-layout: fixed">
+    <table class="table @SelectableClass @StripedClass" style="table-layout: fixed">
         <thead class="table-light">
             <tr>
                 @foreach (var col in VisibleColumns)

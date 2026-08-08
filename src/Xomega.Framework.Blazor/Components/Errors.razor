@@ -1,64 +1,79 @@
 ﻿@* Copyright (c) 2026 Xomega.Net. All rights reserved. *@
 
-@if (ErrorList != null && ErrorList.Errors.Count() > 0)
+@if (ErrorList != null && ErrorList.Errors.Any())
 {
     <div class="@Class">
-        <div class="card">
-            <div class="card-header bg-primary-subtle row g-0 justify-content-between align-items-center px-2">
-                <h6 class="col m-0">@GetTitle()</h6>
-                <button type="button" @onclick="@Close" class="btn-close col-auto ms-1" aria-label="Close"></button>
+        @foreach (var err in ErrorList.Errors.ToList())
+        {
+            <div class="mb-1 p-1 d-flex align-items-center alert alert-@GetSeverityClass(err.Severity)">
+                <i class="fs-5 me-2 bi bi-@GetIconClass(err.Severity)-fill"></i>
+                <span class="flex-fill">@err.Message</span>
+                <button type="button" @onclick="@(e => CloseMessage(err, e))" class="btn-close ms-1" aria-label="Close"
+                        title="@(ErrorList.Errors.Count() > 1 ? GetCloseAllTip() : null)"></button>
             </div>
-            <div class="card-body p-2">
-                @foreach (var err in ErrorList.Errors)
-                {
-                    <div class="mb-1 p-1 d-flex align-items-center alert alert-@GetSeverityClass(err.Severity)">
-                        <i class="fs-5 me-2 bi bi-@GetIconClass(err.Severity)-fill"></i><span>@err.Message</span>
-                    </div>
-                }
-            </div>
-        </div>
+        }
     </div>
 }
 
 @code {
 
+    /// <summary>
+    /// Additional CSS class(es) to apply to the outer container of the error list.
+    /// </summary>
     [Parameter]
     public string Class { get; set; }
 
+    /// <summary>
+    /// The view resource key prefix used to look up view-specific localized text, such as the shift-click tooltip.
+    /// </summary>
     [Parameter]
     public string ViewKey { get; set; }
 
+    /// <summary>
+    /// The list of error, warning, info and success messages to display.
+    /// </summary>
     [Parameter]
     public ErrorList ErrorList { get; set; }
 
-    protected string GetTitle() => ErrorList?.GetTitle(ViewKey);
+    /// <summary>
+    /// Gets the tooltip text hinting that shift-clicking a message's close button will clear all messages.
+    /// </summary>
+    protected string GetCloseAllTip() => ErrorList?.GetCloseAllTip(ViewKey);
 
-    protected string GetSeverityClass(ErrorSeverity severity)
+    /// <summary>
+    /// Maps the given error severity to the corresponding Bootstrap alert/contextual class.
+    /// </summary>
+    protected string GetSeverityClass(ErrorSeverity severity) => severity switch
     {
-        switch (severity)
-        {
-            case ErrorSeverity.Critical:
-            case ErrorSeverity.Error: return "danger";
-            case ErrorSeverity.Warning: return "warning";
-            case ErrorSeverity.Info: return "info";
-        }
-        return "";
-    }
+        ErrorSeverity.Critical or ErrorSeverity.Error => "danger",
+        ErrorSeverity.Warning => "warning",
+        ErrorSeverity.Info => "info",
+        ErrorSeverity.None => "success",
+        _ => ""
+    };
 
-    protected string GetIconClass(ErrorSeverity severity)
+    /// <summary>
+    /// Maps the given error severity to the corresponding Bootstrap Icons class name.
+    /// </summary>
+    protected string GetIconClass(ErrorSeverity severity) => severity switch
     {
-        switch (severity)
-        {
-            case ErrorSeverity.Critical: return "x-octagon";
-            case ErrorSeverity.Error: return "x-circle";
-            case ErrorSeverity.Warning: return "exclamation-triangle";
-            case ErrorSeverity.Info: return "info-circle";
-        }
-        return "";
-    }
+        ErrorSeverity.Critical => "x-octagon",
+        ErrorSeverity.Error => "x-circle",
+        ErrorSeverity.Warning => "exclamation-triangle",
+        ErrorSeverity.Info => "info-circle",
+        ErrorSeverity.None => "check-circle",
+        _ => ""
+    };
 
-    public void Close(MouseEventArgs args)
+    /// <summary>
+    /// Closes the given error message, or clears all messages from the list if the Shift key was held during the click.
+    /// </summary>
+    /// <param name="err">The error message being closed.</param>
+    /// <param name="args">Mouse event arguments used to detect the Shift key modifier.</param>
+    public void CloseMessage(ErrorMessage err, MouseEventArgs args)
     {
-        if (ErrorList != null) ErrorList.Clear();
+        if (ErrorList == null) return;
+        if (args.ShiftKey) ErrorList.Clear();
+        else ErrorList.Errors.Remove(err);
     }
 }

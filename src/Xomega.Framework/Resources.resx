@@ -318,23 +318,11 @@ This action cannot be undone.</value>
   <data name="View_DeleteTitle" xml:space="preserve">
     <value>Delete Confirmation</value>
   </data>
-  <data name="View_Error" xml:space="preserve">
-    <value>Please review the following error.</value>
-  </data>
   <data name="CriteriaView_Error" xml:space="preserve">
     <value>Validation Error</value>
   </data>
-  <data name="View_Errors" xml:space="preserve">
-    <value>Please review the following errors.</value>
-  </data>
   <data name="CriteriaView_Errors" xml:space="preserve">
     <value>Validation Errors</value>
-  </data>
-  <data name="View_Message" xml:space="preserve">
-    <value>Please review the following message.</value>
-  </data>
-  <data name="View_Messages" xml:space="preserve">
-    <value>Please review the following messages.</value>
   </data>
   <data name="View_TitleNew" xml:space="preserve">
     <value>New {0}</value>
@@ -346,12 +334,6 @@ Do you want to discard them and close the view?</value>
   </data>
   <data name="View_UnsavedTitle" xml:space="preserve">
     <value>Unsaved Changes</value>
-  </data>
-  <data name="View_Warning" xml:space="preserve">
-    <value>Please review the following warning.</value>
-  </data>
-  <data name="View_Warnings" xml:space="preserve">
-    <value>Please review the following warnings.</value>
   </data>
   <data name="CriteriaEditObject.Value2" xml:space="preserve">
     <value>Second value</value>
@@ -375,5 +357,8 @@ Do you want to discard them and close the view?</value>
   <data name="Service_MaxRows" xml:space="preserve">
     <value>Returned {0} out of {1} total rows. Please refine your search criteria or use server-side paging.</value>
     <comment>{0}=Rows returned, {1}=Total rows</comment>
+  </data>
+  <data name="Errors_CloseAll" xml:space="preserve">
+    <value>Shft+click to close all.</value>
   </data>
 </root>

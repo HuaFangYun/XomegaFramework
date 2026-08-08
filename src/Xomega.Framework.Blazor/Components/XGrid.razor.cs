@@ -27,6 +27,16 @@ namespace Xomega.Framework.Blazor.Components
         /// </summary>
         [Parameter] public bool AllowSorting { get; set; } = true;
 
+        /// <summary>
+        /// Whether the grid rows should be striped.
+        /// </summary>
+        [Parameter] public bool Striped { get; set; }
+
+        /// <summary>
+        /// Table CSS class based on whether the grid is striped.
+        /// </summary>
+        protected string StripedClass => Striped ? "table-striped" : "";
+
         private List<XGridColumn> Columns { get; set; } = [];
 
         private IEnumerable<XGridColumn> VisibleColumns => Columns.Where(c => c.IsVisible);
@@ -103,8 +113,8 @@ namespace Xomega.Framework.Blazor.Components
         /// <summary>
         /// Row's CSS class based on whether the list allows selection.
         /// </summary>
-        protected virtual string SelectableClass => AllowSelection ?? false ||
-            AllowSelection == null && List?.RowSelectionMode != null ? "table-hover" : "";
+        protected virtual string SelectableClass => (AllowSelection ?? false) ||
+            (AllowSelection == null && List?.RowSelectionMode != null) ? "table-hover" : "";
 
         /// <summary>
         /// Handles row selection on click, if the list latter is selectable.
