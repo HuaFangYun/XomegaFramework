@@ -220,6 +220,13 @@ namespace Xomega.Framework.Web
         public virtual async Task<bool> CanDeleteAsync(CancellationToken token = default)
             => await Task.FromResult(CanDelete());
 
+        /// <inheritdoc/>
+        public virtual bool CanRestore() => true;
+
+        /// <inheritdoc/>
+        public virtual async Task<bool> CanRestoreAsync(CancellationToken token = default)
+            => await Task.FromResult(CanRestore());
+
         /// <summary>Script to popup a modal dialog for a view.</summary>
         protected string Script_ModalDialog = @"if (xomegaControls && typeof xomegaControls._modalViewPopup === 'function')
             xomegaControls._modalViewPopup('{0}', '{1}', '{2}', {3});";

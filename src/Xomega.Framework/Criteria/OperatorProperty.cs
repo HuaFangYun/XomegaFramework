@@ -134,13 +134,11 @@ namespace Xomega.Framework.Criteria
             if (AdditionalPropertyName2 != null)
                 additionalProperty2 = parent[AdditionalPropertyName2];
 
+            if (additionalProperty != null)
+                ResourceKey = additionalProperty.Name;
+
             OnValueChanged(this, new PropertyChangeEventArgs(PropertyChange.All, null, null, null));
         }
-
-        /// <summary>
-        /// Overrides the base method to return the resource key of the associated property.
-        /// </summary>
-        protected override string ResourceKey => additionalProperty?.Name ?? base.ResourceKey;
 
         /// <summary>
         /// Determines if the given operator is applicable for the current additional properties

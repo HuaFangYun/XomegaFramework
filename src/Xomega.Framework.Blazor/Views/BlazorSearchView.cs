@@ -27,7 +27,7 @@ namespace Xomega.Framework.Blazor.Views
         /// </summary>
         public bool CriteriaCollapsed
         {
-            get { return SearchModel?.CriteriaCollapsed ?? false; }
+            get => SearchModel?.CriteriaCollapsed ?? false;
             set
             {
                 if (SearchModel != null)
@@ -60,17 +60,38 @@ namespace Xomega.Framework.Blazor.Views
         /// <summary>
         /// Default handler for searching that delegates the action to the view model.
         /// </summary>
-        protected virtual async Task OnSearchAsync(MouseEventArgs e) => await SearchModel?.SearchAsync(false);
+        protected virtual async Task OnSearchAsync(MouseEventArgs e)
+        {
+            if (SearchModel != null)
+                await SearchModel.SearchAsync(false);
+        }
 
         /// <summary>
         /// Default handler for refreshing that delegates the action to the view model.
         /// </summary>
-        protected virtual async Task OnRefreshAsync(MouseEventArgs e) => await SearchModel?.SearchAsync(true);
+        protected virtual async Task OnRefreshAsync(MouseEventArgs e)
+        {
+            if (SearchModel != null)
+                await SearchModel.SearchAsync(true);
+        }
 
         /// <summary>
         /// Default handler for resetting that delegates the action to the view model.
         /// </summary>
-        protected virtual async Task OnResetAsync(MouseEventArgs e) => await SearchModel?.ResetAsync(this, e);
+        protected virtual async Task OnResetAsync(MouseEventArgs e)
+        {
+            if (SearchModel != null)
+                await SearchModel.ResetAsync(this, e);
+        }
+
+        /// <summary>
+        /// Default handler for restoring that delegates the action to the view model.
+        /// </summary>
+        protected virtual async Task OnRestoreAsync(MouseEventArgs e)
+        {
+            if (SearchModel != null && await CanRestoreAsync())
+                await SearchModel.RestoreAsync(this, e);
+        }
 
         /// <summary>
         /// Default handler for the PermaLink action that adds criteria to the URL.
@@ -90,7 +111,10 @@ namespace Xomega.Framework.Blazor.Views
         /// Default handler for selecting that delegates the action to the view model.
         /// </summary>
         protected virtual async Task OnSelectAsync(MouseEventArgs e)
-            => await SearchModel?.SelectAsync();
+        {
+            if (SearchModel != null)
+                await SearchModel.SelectAsync();
+        }
 
         #endregion
     }

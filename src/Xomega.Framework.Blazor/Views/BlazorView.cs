@@ -150,6 +150,23 @@ namespace Xomega.Framework.Blazor.Views
             => await Task.FromResult(true);
 
         /// <summary>
+        /// Asynchronously determines if the view can be restored to its initial state. If the view is modified,
+        /// then prompts the user to confirm discarding unsaved changes.
+        /// The method can be overridden in subclasses to customize the confirmation prompt.
+        /// </summary>
+        /// <param name="token">Cancellation token.</param>
+        /// <returns>True, if the view can be restored, false otherwise.</returns>
+        public virtual async Task<bool> CanRestoreAsync(CancellationToken token = default)
+        {
+            if (IsModified())
+            {
+                var msg = Model.GetString(Messages.View_RestoreMessage);
+                return await JSRuntime.InvokeAsync<bool>("confirm", token, msg);
+            }
+            return true;
+        }
+
+        /// <summary>
         /// The mode from the view model that it was activated with.
         /// </summary>
         protected virtual string Mode => Model?.Params?[ViewParams.Mode.Param];
@@ -221,10 +238,10 @@ namespace Xomega.Framework.Blazor.Views
         }
 
 		/// <summary>
-		/// Determines if the view or any of its child views are modified.
+		/// Determines if the view's model, or any of its child views are modified.
 		/// </summary>
 		/// <returns>True if the view is modified, false otherwise.</returns>
-		public virtual bool IsModified() => ChildViews.Any(v => v != null && v.IsModified());
+		public virtual bool IsModified() => (Model?.IsModified() ?? false) || ChildViews.Any(v => v != null && v.IsModified());
 
 
 		/// <summary>

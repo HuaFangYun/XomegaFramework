@@ -118,10 +118,18 @@ namespace Xomega.Framework
         /// </summary>
         protected virtual ResourceManager ResourceMgr => parent?.ResourceMgr ?? Messages.ResourceManager;
 
+        // externally set or computed resource key to use
+        private string resourceKey;
+
         /// <summary>
-        /// Base resource key to be used for the property, which can be overridden in subclasses.
+        /// Base resource key to be used for the property to look up the label and other resources.
+        /// Defaults to the property name, but can be explicitly set or computed to override it.
         /// </summary>
-        protected virtual string ResourceKey => Name;
+        public string ResourceKey
+        {
+            get => resourceKey ?? Name;
+            set => resourceKey = value;
+        }
 
         /// <summary>
         /// Parent resource key for the property to qualify the base resource key.

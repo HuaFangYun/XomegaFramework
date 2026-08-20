@@ -61,6 +61,12 @@ namespace Xomega.Framework.Views
         public bool Activated { get; private set; }
 
         /// <summary>
+        /// Resets the activation state, so that the next call to <see cref="ActivateAsync"/>
+        /// is not skipped even if it's called with the same parameters as before.
+        /// </summary>
+        protected void ResetActivation() => Activated = false;
+
+        /// <summary>
         /// Activates the view model and the view.
         /// </summary>
         /// <param name="parameters">Parameters to activate the view with</param>
@@ -102,6 +108,13 @@ namespace Xomega.Framework.Views
             return Params.AllKeys.OrderBy(key => key).SequenceEqual(parameters.AllKeys.OrderBy(key => key))
                 && Params.AllKeys.All(key => Params[key] == parameters[key]);
         }
+
+        /// <summary>
+        /// Determines if the view model is modified. Subclasses should override this method
+        /// to check the modified state of their data object(s).
+        /// </summary>
+        /// <returns>True if the view model is modified, false otherwise.</returns>
+        public virtual bool IsModified() => false;
 
         #endregion
 

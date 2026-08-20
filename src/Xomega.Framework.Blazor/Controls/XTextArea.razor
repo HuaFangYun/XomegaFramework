@@ -1,0 +1,24 @@
+@inherits XComponent
+
+@if (IsVisible)
+{
+    <div class="@Class">
+        @if (ShowLabel)
+        {
+            <label class="form-label @StateClass" accesskey="@GetAccessKey()" for="@ControlId">@GetLabel(Label)</label>
+        }
+        <textarea id="@ControlId"
+                  class="form-control @StateClass"
+                  placeholder="@Placeholder"
+                  disabled="@(!IsEditable)"
+                  rows="@Rows"
+                  @onchange="@OnValueChanged" @onblur="OnBlur">@Value</textarea>
+        <div class="@ErrorsClass">@ErrorsText</div>
+    </div>
+}
+
+@code {
+    [Parameter] public int Rows { get; set; } = 3;
+
+    protected string Value => Property?.GetStringValue(IsEditable ? ValueFormat.EditString : ValueFormat.DisplayString, Row);
+}

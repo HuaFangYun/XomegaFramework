@@ -241,6 +241,12 @@ namespace Xomega.Framework
         public const string Validation_IntegerFormat = "Validation_IntegerFormat";
 
         /// <summary>
+        /// {0} contains invalid JSON.
+        /// Where {0}=Property name
+        /// </summary>
+        public const string Validation_JsonFormat = "Validation_JsonFormat";
+
+        /// <summary>
         /// Invalid lookup table '{1}' specified for {0}.
         /// Where {0}=Property name, {1}=Lookup table name
         /// </summary>
@@ -366,6 +372,16 @@ namespace Xomega.Framework
         public const string View_UnsavedTitle = "View_UnsavedTitle";
 
         /// <summary>
+        /// Are you sure you want to discard your changes and restore the view to its initial state?
+        /// </summary>
+        public const string View_RestoreMessage = "View_RestoreMessage";
+
+        /// <summary>
+        /// Restore Confirmation
+        /// </summary>
+        public const string View_RestoreTitle = "View_RestoreTitle";
+
+        /// <summary>
         /// Second value
         /// </summary>
         public const string CriteriaEditObject_Value2 = "CriteriaEditObject.Value2";
@@ -406,5 +422,25 @@ namespace Xomega.Framework
         /// Shft+click to close all.
         /// </summary>
         public const string Errors_CloseAll = "Errors_CloseAll";
+
+        /// <summary>
+        /// Restore
+        /// </summary>
+        public const string Action_Restore = "Action_Restore";
+
+        /// <summary>
+        /// R
+        /// </summary>
+        public const string Action_Restore_AccessKey = "Action_Restore_AccessKey";
+
+        /// <summary>
+        /// Reload
+        /// </summary>
+        public const string Action_Reload = "Action_Reload";
+
+        /// <summary>
+        /// R
+        /// </summary>
+        public const string Action_Reload_AccessKey = "Action_Reload_AccessKey";
     }
 }

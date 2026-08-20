@@ -254,6 +254,10 @@
     <value>{0} contains an invalid number.</value>
     <comment>{0}=Property name</comment>
   </data>
+  <data name="Validation_JsonFormat" xml:space="preserve">
+    <value>{0} contains invalid JSON.</value>
+    <comment>{0}=Property name</comment>
+  </data>
   <data name="Validation_InvalidLookupTable" xml:space="preserve">
     <value>Invalid lookup table '{1}' specified for {0}.</value>
     <comment>{0}=Property name, {1}=Lookup table name</comment>
@@ -335,6 +339,12 @@ Do you want to discard them and close the view?</value>
   <data name="View_UnsavedTitle" xml:space="preserve">
     <value>Unsaved Changes</value>
   </data>
+  <data name="View_RestoreMessage" xml:space="preserve">
+    <value>Are you sure you want to discard your changes and restore the view to its initial state?</value>
+  </data>
+  <data name="View_RestoreTitle" xml:space="preserve">
+    <value>Restore Confirmation</value>
+  </data>
   <data name="CriteriaEditObject.Value2" xml:space="preserve">
     <value>Second value</value>
   </data>
@@ -360,5 +370,17 @@ Do you want to discard them and close the view?</value>
   </data>
   <data name="Errors_CloseAll" xml:space="preserve">
     <value>Shft+click to close all.</value>
+  </data>
+  <data name="Action_Restore" xml:space="preserve">
+    <value>Restore</value>
+  </data>
+  <data name="Action_Restore_AccessKey" xml:space="preserve">
+    <value>R</value>
+  </data>
+  <data name="Action_Reload" xml:space="preserve">
+    <value>Reload</value>
+  </data>
+  <data name="Action_Reload_AccessKey" xml:space="preserve">
+    <value>R</value>
   </data>
 </root>

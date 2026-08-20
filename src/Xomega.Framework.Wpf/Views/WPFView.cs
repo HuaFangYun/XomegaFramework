@@ -45,6 +45,12 @@ namespace Xomega.Framework.Views
         /// <returns>True if the view can be deleted, False otherwise</returns>
         public virtual bool CanDelete() => false;
 
+        /// <summary>
+        /// Checks if the view can be restored to its initial state
+        /// </summary>
+        /// <returns>True if the view can be restored, False otherwise</returns>
+        public virtual bool CanRestore() => true;
+
         #endregion
 
         #region View title
@@ -434,6 +440,10 @@ namespace Xomega.Framework.Views
         /// <inheritdoc/>
         public Task<bool> CanDeleteAsync(CancellationToken token = default)
             => Task.FromResult(CanDelete());
+
+        /// <inheritdoc/>
+        public Task<bool> CanRestoreAsync(CancellationToken token = default)
+            => Task.FromResult(CanRestore());
 
         #endregion
     }

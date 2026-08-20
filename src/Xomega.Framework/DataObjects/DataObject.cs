@@ -76,15 +76,25 @@ namespace Xomega.Framework
 
             // add save action, and make it enabled only when the object is modified or doesn't track modifications
             SaveAction = new ActionProperty(this, Messages.Action_Save);
-            Expression<Func<DataObject, bool>> saveEnabled = (obj) => obj != null && (obj.Modified || !obj.TrackModifications);
-            SaveAction.SetComputedEnabled(saveEnabled, this);
+            SaveAction.SetComputedEnabled(ComputedExpressions.ObjectIsModified, this);
 
             // add delete action, and make it enabled only when the object is not new
             DeleteAction = new ActionProperty(this, Messages.Action_Delete);
-            Expression<Func<DataObject, bool>> deleteEnabled = (obj) => obj != null && !obj.IsNew;
-            DeleteAction.SetComputedEnabled(deleteEnabled, this);
+            DeleteAction.SetComputedEnabled(ComputedExpressions.ObjectIsNotNew, this);
 
-            ResetAction = new ActionProperty(this, ResetName);
+            // add reset action, and make it enabled only when the object is new
+            ResetAction = new ActionProperty(this, Messages.Action_Reset);
+            ResetAction.SetComputedVisible(ComputedExpressions.ObjectIsNew, this);
+
+            // add restore action for existing objects, and make it enabled only when the object is modified
+            RestoreAction = new ActionProperty(this, Messages.Action_Restore);
+            RestoreAction.SetComputedVisible(ComputedExpressions.ObjectIsNotNew, this);
+            RestoreAction.SetComputedEnabled(ComputedExpressions.ObjectIsModified, this);
+
+            // add reload action for existing objects, and make it enabled only when the object is not new and not modified
+            ReloadAction = new ActionProperty(this, Messages.Action_Reload);
+            ReloadAction.SetComputedEnabled(ComputedExpressions.ObjectIsNotNew, this);
+            ReloadAction.SetComputedEnabled(ComputedExpressions.ObjectIsNotModified, this);
 
             // call subclass initialization in a separate method
             // to make sure base initialization is always called
@@ -127,26 +137,32 @@ namespace Xomega.Framework
         }
 
         /// <summary>
-        /// The criteria/list reset action associated with this list object,
+        /// The restore action for restoring the data object or criteria/list to the initial state,
+        /// which allows controlling the state of the button bound to it.
+        /// </summary>
+        public ActionProperty RestoreAction { get; private set; }
+
+        /// <summary>
+        /// The reload action for reloading unmodified data objects or saved criteria
+        /// </summary>
+        public ActionProperty ReloadAction { get; private set; }
+
+        /// <summary>
+        /// The reset action for clearing the data object or criteria/list,
         /// which allows controlling the state of the button bound to it.
         /// </summary>
         public ActionProperty ResetAction { get; private set; }
-
-        /// <summary>
-        /// Name for the ResetAction property that can be overridden in subclasses.
-        /// </summary>
-        protected virtual string ResetName => Messages.Action_Reset;
 
         /// <summary>
         /// Resets data object to initial values
         /// </summary>
         public virtual void ResetData()
         {
-            foreach (DataProperty p in properties.Values)
+            foreach (var p in properties.Values)
                 p.ResetValue();
-            foreach (string chName in childObjects.Keys)
+            foreach (var chName in childObjects.Keys)
                 childObjects[chName].ResetData();
-            modified = null;
+            SetModified(false, true);
         }
 
         /// <summary>
@@ -154,11 +170,11 @@ namespace Xomega.Framework
         /// </summary>
         public virtual async Task ResetDataAsync()
         {
-            foreach (DataProperty p in properties.Values)
+            foreach (var p in properties.Values)
                 await p.ResetValueAsync();
-            foreach (string chName in childObjects.Keys)
+            foreach (var chName in childObjects.Keys)
                 await childObjects[chName].ResetDataAsync();
-            modified = null;
+            SetModified(false, true);
         }
 
         /// <summary>

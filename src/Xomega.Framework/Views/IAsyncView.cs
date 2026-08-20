@@ -40,6 +40,12 @@ namespace Xomega.Framework.Views
         Task<bool> CanDeleteAsync(CancellationToken token = default);
 
         /// <summary>
+        /// Checks if the view can be restored to its initial state.
+        /// </summary>
+        /// <returns>True if the view can be restored, False otherwise</returns>
+        Task<bool> CanRestoreAsync(CancellationToken token = default);
+
+        /// <summary>
         /// Disposes the view without closing.
         /// </summary>
         Task DisposeAsync(CancellationToken token = default);

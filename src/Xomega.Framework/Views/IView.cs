@@ -36,5 +36,11 @@ namespace Xomega.Framework.Views
         /// </summary>
         /// <returns>True if the view can be deleted, False otherwise</returns>
         bool CanDelete();
+
+        /// <summary>
+        /// Checks if the view can be restored to its initial state
+        /// </summary>
+        /// <returns>True if the view can be restored, False otherwise</returns>
+        bool CanRestore();
     }
 }

@@ -182,6 +182,13 @@ namespace Xomega.Framework
 
         #region Modification support
 
+        /// <summary>
+        /// A flag indicating if this property is tracking modifications.
+        /// Setting it to false allows excluding transient UI properties
+        /// (e.g. selectors) from the parent data object's modification tracking.
+        /// </summary>
+        public bool TrackModifications { get; set; } = true;
+
         private bool? modified;
 
         /// <summary>
@@ -198,7 +205,11 @@ namespace Xomega.Framework
         /// </summary>
         /// <param name="row"></param>
         /// <returns></returns>
-        public bool? GetModified(DataRow row) => row?.GetModified(this) ?? modified;
+        public bool? GetModified(DataRow row)
+        {
+            bool? res = row?.GetModified(this) ?? modified;
+            return !TrackModifications && res != null ? false : res;
+        }
 
         /// <summary>
         /// Sets the modification state of the current property for the specified row

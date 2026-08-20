@@ -30,6 +30,22 @@ namespace Xomega.Framework.Views
             };
         }
 
+        /// <summary>
+        /// Appends an asterisk to the view title when activated criteria are locked and criteria is modified.
+        /// </summary>
+        public override string ViewTitle => BaseTitle + (IsModified() ? "*" : "");
+
+        /// <summary>
+        /// Handles changes in the Modified property of the criteria object to notify views of any view title updates.
+        /// </summary>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Property change event arguments.</param>
+        protected virtual void OnCriteriaObjectChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(DataObject.Modified))
+                OnPropertyChanged(new PropertyChangedEventArgs(ViewTitleProperty));
+        }
+
         /// <inheritdoc/>
         public override bool Activate(NameValueCollection parameters)
         {
@@ -92,10 +108,49 @@ namespace Xomega.Framework.Views
 
         #region Data object
 
+        private DataListObject list;
+
         /// <summary>
         /// List data object for the view
         /// </summary>
-        public DataListObject List { get; set; }
+        public DataListObject List
+        {
+            get => list;
+            set
+            {
+                if (list != null)
+                {
+                    list.PropertyChanged -= OnListChanged;
+                    if (list.CriteriaObject != null)
+                        list.CriteriaObject.PropertyChanged -= OnCriteriaObjectChanged;
+                }
+                list = value;
+                if (list != null)
+                {
+                    list.PropertyChanged += OnListChanged;
+                    if (list.CriteriaObject != null)
+                        list.CriteriaObject.PropertyChanged += OnCriteriaObjectChanged;
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        public override bool IsModified() => ShouldLockActivatedCriteria && (List?.CriteriaObject?.IsModified() ?? false);
+
+        /// <summary>
+        /// Handles changes in the List's CriteriaObject to (re)subscribe to its Modified property changes.
+        /// </summary>
+        /// <param name="sender">Event sender.</param>
+        /// <param name="e">Property change event arguments.</param>
+        protected virtual void OnListChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(DataListObject.CriteriaObject))
+            {
+                if (sender is DataListObject dlo && dlo.CriteriaObject != null)
+                    dlo.CriteriaObject.PropertyChanged += OnCriteriaObjectChanged;
+                OnPropertyChanged(new PropertyChangedEventArgs(ViewTitleProperty));
+            }
+        }
 
         #endregion
 
@@ -104,7 +159,7 @@ namespace Xomega.Framework.Views
         /// <summary>
         /// Controls if criteria panel will automatically collapse/expand on Search/Reset.
         /// </summary>
-        protected virtual bool AutoCollapseCriteria { get { return true; } }
+        protected virtual bool AutoCollapseCriteria => true;
 
         /// <summary>
         /// Name for the CriteriaCollapsed observable property
@@ -118,7 +173,7 @@ namespace Xomega.Framework.Views
         /// </summary>
         public bool CriteriaCollapsed
         {
-            get { return criteriaCollapsed; }
+            get => criteriaCollapsed;
             set
             {
                 criteriaCollapsed = value;
@@ -207,6 +262,10 @@ namespace Xomega.Framework.Views
                 CriteriaCollapsed = true;
         }
 
+        #endregion
+
+        #region Reset
+
         /// <summary>
         /// Resets current view to initial state
         /// </summary>
@@ -240,6 +299,32 @@ namespace Xomega.Framework.Views
             }
             if (AutoCollapseCriteria)
                 CriteriaCollapsed = false;
+        }
+
+        /// <summary>
+        /// Restores current view to its initial state and then reactivates it with the parameters
+        /// it was previously activated with.
+        /// </summary>
+        /// <param name="sender">Command sender</param>
+        /// <param name="e">Event arguments</param>
+        public virtual void Restore(object sender, EventArgs e)
+        {
+            Reset(sender, e);
+            Activate(Params);
+        }
+
+        /// <summary>
+        /// Restores current view to its initial state and then reactivates it with the parameters
+        /// it was previously activated with.
+        /// </summary>
+        /// <param name="sender">Command sender</param>
+        /// <param name="e">Event arguments</param>
+        /// <param name="token">Cancellation token.</param>
+        public virtual async Task RestoreAsync(object sender, EventArgs e, CancellationToken token = default)
+        {
+            await ResetAsync(sender, e);
+            ResetActivation();
+            await ActivateAsync(Params, token);
         }
 
         #endregion

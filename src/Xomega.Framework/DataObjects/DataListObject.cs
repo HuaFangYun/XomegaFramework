@@ -461,10 +461,20 @@ namespace Xomega.Framework
 
         #region Applied criteria
 
+        private CriteriaObject criteriaObject;
+
         /// <summary>
         /// Criteria object associated with the current list object
         /// </summary>
-        public CriteriaObject CriteriaObject { get; set; }
+        public CriteriaObject CriteriaObject
+        {
+            get => criteriaObject;
+            set
+            {
+                criteriaObject = value;
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(CriteriaObject)));
+            }
+        }
 
         private List<FieldCriteriaDisplay> appliedCriteria;
 

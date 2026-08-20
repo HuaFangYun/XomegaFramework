@@ -46,9 +46,6 @@ namespace Xomega.Framework.Criteria
         {
         }
 
-        /// <inheritdoc/>
-        protected override string ResetName => Messages.Action_ResetAll;
-
         /// <summary>
         /// A map of criteria property groups for each field criteria.
         /// </summary>
@@ -79,6 +76,8 @@ namespace Xomega.Framework.Criteria
         /// </summary>
         protected override void OnInitialized()
         {
+            // set the resource key to indicate that it resets both the criteria and the list
+            ResetAction.ResourceKey = Messages.Action_ResetAll;
             FieldSelectorProperty = new DataProperty(this, FieldSelector)
             {
                 AsyncItemsProvider = async (input, row, token) =>
@@ -94,7 +93,8 @@ namespace Xomega.Framework.Criteria
                         return true;
                     }
                     return false;
-                }
+                },
+                TrackModifications = false,
             };
 
             FieldSelectorProperty.AsyncChange += async (sender, e, t) =>
@@ -169,6 +169,7 @@ namespace Xomega.Framework.Criteria
             base.SetValues(nvc);
             AdjustOperators();
             LockCriteria(nvc, lockCriteria);
+            SetModified(false, true);
         }
 
         /// <summary>
@@ -182,6 +183,7 @@ namespace Xomega.Framework.Criteria
             await base.SetValuesAsync(nvc, token);
             AdjustOperators();
             LockCriteria(nvc, lockCriteria);
+            SetModified(false, true);
         }
 
         /// <summary>
@@ -194,6 +196,13 @@ namespace Xomega.Framework.Criteria
         protected void LockCriteria(NameValueCollection nvc, bool lockCriteria)
         {
             if (nvc == null) return;
+
+            if (lockCriteria)
+            {
+                // use restore rather than reset when criteria are locked
+                ResetAction.Visible = false;
+                RestoreAction.Visible = true;
+            }
 
             foreach (var key in nvc.AllKeys)
             {
@@ -241,7 +250,7 @@ namespace Xomega.Framework.Criteria
         /// Resets data object to initial values, optionally only for the editable properties.
         /// </summary>
         /// <param name="editableOnly">True to reset only editable properties, false to reset all of them.</param>
-        public void ResetData(bool editableOnly)
+        public virtual void ResetData(bool editableOnly)
         {
             if (!editableOnly)
             {
@@ -256,7 +265,7 @@ namespace Xomega.Framework.Criteria
         /// Resets data object to initial values asynchronously, optionally only for the editable properties.
         /// </summary>
         /// <param name="editableOnly">True to reset only editable properties, false to reset all of them.</param>
-        public async Task ResetDataAsync(bool editableOnly)
+        public virtual async Task ResetDataAsync(bool editableOnly)
         {
             if (!editableOnly)
             {

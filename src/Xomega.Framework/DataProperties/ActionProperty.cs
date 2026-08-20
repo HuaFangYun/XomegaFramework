@@ -25,6 +25,7 @@ namespace Xomega.Framework
         public ActionProperty(IServiceProvider serviceProvider, string name) : base(null, name)
         {
             this.serviceProvider = serviceProvider;
+            ResourceKey = GetActionResourceKey(name);
         }
 
         /// <summary>
@@ -34,8 +35,16 @@ namespace Xomega.Framework
         /// <param name="name">The name of the action, which should be unique within the parent data object.</param>
         public ActionProperty(DataObject parent, string name) : base(parent, name)
         {
-            if (parent != null) parent.AddAction(this);
+            parent?.AddAction(this);
+            ResourceKey = GetActionResourceKey(name);
         }
+
+        /// <summary>
+        /// Computes the resource key for an action with the given name, prepending the 'Action_' prefix as needed.
+        /// </summary>
+        /// <param name="name">The action name.</param>
+        /// <returns>The resource key for the action.</returns>
+        private static string GetActionResourceKey(string name) => (name.StartsWith("Action_") ? "" : "Action_") + name;
 
         /// <summary>
         /// Specifies whether the action is currently enabled.
@@ -69,11 +78,6 @@ namespace Xomega.Framework
         /// <param name="token">Cancellation token.</param>
         /// <returns>The task for the asynchronous operation.</returns>
         public Task UpdateComputedEnabledAsync(CancellationToken token = default) => UpdateComputedEditableAsync(null, token);
-
-        /// <summary>
-        /// Overrides action's resource key to prepend the 'Action_' prefix as needed.
-        /// </summary>
-        protected override string ResourceKey => (Name.StartsWith("Action_") ? "" : "Action_") + Name;
 
         /// <summary>
         /// Overrides the parent resource key to use underscore as a separator,

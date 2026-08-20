@@ -21,12 +21,6 @@ namespace Xomega.Framework.Blazor.Views
         /// </summary>
         protected DataObject DetailsObject => DetailsModel?.DetailsObject;
 
-        /// <summary>
-        /// Determines if the view is modified.
-        /// </summary>
-        /// <returns>True if the view is modified, false otherwise.</returns>
-        public override bool IsModified() => DetailsObject?.IsModified() ?? false || base.IsModified();
-
         /// <inheritdoc/>
         protected override string UpperClass => Mode == null ? "container d-flex align-items-center justify-content-center" : base.UpperClass;
 

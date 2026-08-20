@@ -93,6 +93,9 @@ namespace Xomega.Framework.Views
             }
         }
 
+        /// <inheritdoc/>
+        public override bool IsModified() => DetailsObject?.IsModified() ?? false;
+
         /// <summary>
         /// Handles changes in the Modified and IsNew properties of the data object to notify views of any view title updates.
         /// </summary>
@@ -110,11 +113,10 @@ namespace Xomega.Framework.Views
         {
             get
             {
-                bool isNew = DetailsObject?.IsNew ?? true;
-                bool isModified = DetailsObject?.IsModified() ?? false;
-                string title = BaseTitle;
+                var isNew = DetailsObject?.IsNew ?? true;
+                var title = BaseTitle;
                 if (isNew) title = GetString(Messages.View_TitleNew, title);
-                if (isModified) title += "*";
+                if (IsModified()) title += "*";
                 return title;
             }
         }
