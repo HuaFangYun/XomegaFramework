@@ -23,6 +23,11 @@ namespace Xomega.Framework.Views
             public const string Create = "create";
 
             /// <summary>
+            /// Action to update an existing object
+            /// </summary>
+            public const string Update = "update";
+
+            /// <summary>
             /// Action to initiate search on activation
             /// </summary>
             public const string Search = "search";

@@ -34,6 +34,15 @@ namespace Xomega.Framework.Views
             if (ViewParams.Action.Create != Params[ViewParams.Action.Param])
                 LoadData(false);
 
+            if (ViewParams.Action.Update == Params[ViewParams.Action.Param])
+            {
+                // Re-populate the object with activation parameters to update
+                InitializeObject();
+                Save(this, EventArgs.Empty);
+                // Keep the view open if there were errors during save
+                return Errors.HasErrors();
+            }
+
             return true;
         }
 
@@ -46,6 +55,15 @@ namespace Xomega.Framework.Views
 
             if (ViewParams.Action.Create != Params[ViewParams.Action.Param])
                 await LoadDataAsync(false, token);
+
+            if (ViewParams.Action.Update == Params[ViewParams.Action.Param])
+            {
+                // Re-populate the object with activation parameters to update
+                await InitializeObjectAsync(token);
+                await SaveAsync(token);
+                // Keep the view open if there were errors during save
+                return Errors.HasErrors();
+            }
 
             return true;
         }
